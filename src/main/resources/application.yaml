@@ -1,0 +1,150 @@
+#### WORKER CONFIGURATION ####################################################################################
+###
+### IMPORTANT : Empty property on the block peps.* will be injected as environment variable during deployment
+###
+##############################################################################################################
+peps:
+  trigram: cms
+  management:
+    base-path: /${peps.trigram}/
+  resources:
+    topics:
+      inputhubmedia:
+        id: inputhubmedia
+        namespace: eh-peps-export-we1-dev # hub namespace
+        name: peps-ng-media-test # hub name
+        connstring: Endpoint=sb://eh-peps-export-we1-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=mPc3y5NK7dPsuwhJODeDcgpuf//NGdAM0VbvTwWw9OI= # hub connection string
+        group: $Default # consumer group
+      inputhubproduct:
+        id: inputhubproduct
+        namespace: eh-peps-export-we1-dev # hub namespace
+        name: peps-ng-product-test # hub name
+        connstring: Endpoint=sb://eh-peps-export-we1-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=mPc3y5NK7dPsuwhJODeDcgpuf//NGdAM0VbvTwWw9OI= # hub connection string
+        group: $Default # consumer group
+  recursivity:
+    level: 0
+  messaging:
+    type: kafka
+    security-protocol: SASL_SSL
+    sasl-mechanism: PLAIN
+  logging:
+    division: PEPS
+    trigram: CMS
+  common:
+    errors:
+      occured-on:
+        eventhub:
+          namespace: ${peps.resources.topics.inputhubmedia.namespace}
+          name: ${peps.resources.topics.inputhubmedia.name}
+          group: ${peps.resources.topics.inputhubmedia.group}
+  schema:
+    versions:
+      products: 2.1.0
+      skus: 4.6.0
+      assets: 2.1.0
+      prices: 2.0.0
+      referentials: 1.1.0
+
+# SPRING CLOUD CONFIGURATION
+spring:
+  cloud:
+    function:
+      definition: processMediaEvents;processProductEvents
+    stream:
+      binders:
+        inputhubmedia:
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: ${peps.resources.topics.inputhubmedia.namespace}.servicebus.windows.net:9093
+                      configuration:
+                        sasl:
+                          jaas:
+                            config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="${peps.resources.topics.inputhubmedia.connstring}";
+                          mechanism: ${peps.messaging.sasl-mechanism}
+                        security:
+                          protocol: ${peps.messaging.security-protocol}
+                    enableObservation: true
+          type: ${peps.messaging.type}
+        inputhubproduct:
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: ${peps.resources.topics.inputhubproduct.namespace}.servicebus.windows.net:9093
+                      configuration:
+                        sasl:
+                          jaas:
+                            config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="${peps.resources.topics.inputhubproduct.connstring}";
+                          mechanism: ${peps.messaging.sasl-mechanism}
+                        security:
+                          protocol: ${peps.messaging.security-protocol}
+                    enableObservation: true
+          type: ${peps.messaging.type}
+      defaultBinder: ${peps.resources.topics.inputhubmedia.id}
+      bindings:
+        processMediaEvents-in-0:
+          binder: ${peps.resources.topics.inputhubmedia.id}
+          destination: ${peps.resources.topics.inputhubmedia.name}
+          group: ${peps.resources.topics.inputhubmedia.group}
+          consumer:
+            maxAttempts: 1
+        processProductEvents-in-0:
+          binder: ${peps.resources.topics.inputhubproduct.id}
+          destination: ${peps.resources.topics.inputhubproduct.name}
+          group: ${peps.resources.topics.inputhubproduct.group}
+          consumer:
+            maxAttempts: 1
+
+  jpa:
+    generate-ddl: false
+    database: default
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;useSSL=false;trustServerCertificate=true;databaseName=peps_ng_cms
+    username: peps_user
+    password: peps_user
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  liquibase:
+    change-log: classpath:db/liquibase/master.xml
+
+# SPRING ACTUATOR CONFIGURATION
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,caches,events,bindings,shutdown
+      base-path: ${peps.management.base-path}
+      path-mapping:
+        info: /infos
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-components: always
+      show-details: never
+    shutdown:
+      enabled: true
+
+endpoints:
+  shutdown:
+    enabled: true
+
+info:
+  app:
+    name: peps-ng-cms
+    trigram: ${peps.trigram}
+    description: PEPS NextGen CMS Service
+

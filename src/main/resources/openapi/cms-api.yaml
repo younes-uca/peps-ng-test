@@ -1,0 +1,1606 @@
+openapi: 3.0.1
+info:
+  title: PEPS-CMS-APP OpenApi Doc
+  description: Describes all PEPS-CMS-APP Microservice APIs
+  termsOfService: 'true'
+  contact:
+    name: SQLI/CHANEL
+    url: http://www.sqli.com
+    email: ykharchaf@sqli.com
+  version: 1.0.0
+servers:
+  - url: /api/cms
+tags:
+  - name: cms-container-controller
+    description: Cms Container Controller
+  - name: cms-content-controller
+    description: Cms Content Controller
+  - name: cms-config-controller
+paths:
+  /containers/filters:
+    get:
+      summary: Search Container facets
+      operationId: CMS_getCmsContainersFilters
+      parameters:
+        - name: buyingFrameName
+          in: query
+          schema:
+            type: string
+        - name: containerType
+          in: query
+          schema:
+            type: string
+        - name: fields
+          in: query
+          schema:
+            type: string
+        - name: itemSeasonName
+          in: query
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+        - name: product
+          in: query
+          schema:
+            type: string
+        - name: range
+          in: query
+          schema:
+            type: string
+        - name: subDepartmentGroupName
+          in: query
+          schema:
+            type: string
+        - name: text
+          in: query
+          schema:
+            type: string
+        - name: themeName
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/FacetResultData'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+      tags:
+        - cms-container-controller
+  /containers/search:
+    get:
+      tags:
+        - cms-container-controller
+      summary: >-
+        Get all CMSContainers filtred by given parametters (facets + search
+        text)
+      operationId: CMS_searchCmsContainers
+      parameters:
+        - name: buyingFrameName
+          in: query
+          schema:
+            type: string
+        - name: containerType
+          in: query
+          schema:
+            type: string
+        - name: fields
+          in: query
+          schema:
+            type: string
+        - name: itemSeasonName
+          in: query
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+        - name: product
+          in: query
+          schema:
+            type: string
+        - name: range
+          in: query
+          schema:
+            type: string
+        - name: subDepartmentGroupName
+          in: query
+          schema:
+            type: string
+        - name: text
+          in: query
+          schema:
+            type: string
+        - name: themeName
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContainersResult'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+  /containers/{containerType}:
+    post:
+      tags:
+        - cms-container-controller
+      summary: 'Creation of a new cms container '
+      operationId: CMS_createCmsContainer
+      parameters:
+        - name: containerType
+          in: path
+          description: CMS Container Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSPageContainer
+              - CMSPdpContainer
+              - CMSFooterContainer
+              - CMSIntegrationPageContainer
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      requestBody:
+        description: Cms Container to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CMSContainer'
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContainer'
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: cmsContainer
+  /pages/{pageLabel}:
+    get:
+      tags:
+        - cms-container-controller
+      summary: Get a CMS Container by label
+      operationId: CMS_getCmsContainerByLabel
+      parameters:
+        - name: pageLabel
+          in: path
+          description: CMS Container identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContainer'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+  /containers/{containerType}/{containerId}:
+    get:
+      tags:
+        - cms-container-controller
+      summary: Get a CMS Container by ID and type
+      operationId: CMS_getCmsContainerByIdAndType
+      parameters:
+        - name: containerId
+          in: path
+          description: CMS Container identifier
+          required: true
+          schema:
+            type: string
+        - name: containerType
+          in: path
+          description: CMS Container Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSPageContainer
+              - CMSPdpContainer
+              - CMSFooterContainer
+              - CMSIntegrationPageContainer
+        - name: syncStatus
+          in: query
+          description: get synchronization Status ?
+          allowEmptyValue: false
+          schema:
+            type: boolean
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContainer'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+    put:
+      tags:
+        - cms-container-controller
+      summary: update  cms container container
+      operationId: CMS_updateCmsPageContainer
+      parameters:
+        - name: containerId
+          in: path
+          description: CMS Container identifier
+          required: true
+          schema:
+            type: string
+        - name: containerType
+          in: path
+          description: CMS Container Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSPageContainer
+              - CMSPdpContainer
+              - CMSFooterContainer
+              - CMSIntegrationPageContainer
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      requestBody:
+        description: CMS container Data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CMSContainer'
+        required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContainer'
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: cmsContainer
+  /containers/{containerType}/{containerId}/synchronize:
+    put:
+      tags:
+        - cms-container-controller
+      summary: Synchronize cms container
+      operationId: CMS_synchronizeCmsContainer
+      parameters:
+        - name: containerId
+          in: path
+          description: CMS Container identifier
+          required: true
+          schema:
+            type: string
+        - name: containerType
+          in: path
+          description: CMS Container Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSPageContainer
+              - CMSPdpContainer
+              - CMSFooterContainer
+              - CMSIntegrationPageContainer
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+  /contents/{contentType}:
+    post:
+      tags:
+        - cms-content-controller
+      summary: >-
+        Create CMS Content and attach it to an existing CMS Container on a
+        specific position and on a specific slot, if no position specified the
+        content will be attached at the end.
+      operationId: CMS_createCmsContent
+      parameters:
+        - name: containerId
+          in: query
+          description: CMS Container identifier
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+        - name: containerType
+          in: query
+          description: CMS Container Type
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - CMSPageContainer
+              - CMSPdpContainer
+              - CMSFooterContainer
+              - CMSIntegrationPageContainer
+        - name: contentType
+          in: path
+          description: CMS Content Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSParagraph
+              - CMSTitle
+              - CMSFileDownload
+              - CMSImage
+              - CMSCarousel
+              - CMSImageZoom
+        - name: position
+          in: query
+          description: position of content in container
+          allowEmptyValue: false
+          schema:
+            type: integer
+            format: int32
+        - name: slotName
+          in: query
+          description: slot Name
+          allowEmptyValue: false
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      requestBody:
+        description: CMS content Data
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/CMSContent'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContent'
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+  /contents/{contentType}/{contentId}:
+    get:
+      tags:
+        - cms-content-controller
+      summary: Get CMS Content by type and ID
+      operationId: CMS_getCmsContentByIdAndType
+      parameters:
+        - name: contentId
+          in: path
+          description: CMS content identifier
+          required: true
+          schema:
+            type: string
+        - name: contentType
+          in: path
+          description: CMS Content Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSParagraph
+              - CMSTitle
+              - CMSFileDownload
+              - CMSImage
+              - CMSCarousel
+              - CMSImageZoom
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContent'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+    put:
+      tags:
+        - cms-content-controller
+      summary: Update existing CMS Content
+      operationId: CMS_updateCmsContent
+      parameters:
+        - name: contentId
+          in: path
+          description: CMS content identifier
+          required: true
+          schema:
+            type: string
+        - name: contentType
+          in: path
+          description: CMS Content Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSParagraph
+              - CMSTitle
+              - CMSFileDownload
+              - CMSImage
+              - CMSCarousel
+              - CMSImageZoom
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      requestBody:
+        description: CMS content Data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CMSContent'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContent'
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+      x-codegen-request-body-name: cmsContent
+    delete:
+      tags:
+        - cms-content-controller
+      summary: Detach CMS Content from given CMS container
+      operationId: CMS_detachCmsContent
+      parameters:
+        - name: containerId
+          in: query
+          description: Container Id
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+        - name: containerType
+          in: query
+          description: Container Type
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+        - name: contentId
+          in: path
+          description: CMS content identifier
+          required: true
+          schema:
+            type: string
+        - name: contentType
+          in: path
+          description: CMS Content Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSParagraph
+              - CMSTitle
+              - CMSFileDownload
+              - CMSImage
+              - CMSCarousel
+              - CMSImageZoom
+        - name: version
+          in: query
+          description: Catalog version
+          allowEmptyValue: false
+          schema:
+            type: string
+            enum:
+              - Staged
+              - Online
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '204':
+          description: No Content
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+      deprecated: false
+  /contents/{contentType}/{contentId}/revert:
+    put:
+      tags:
+        - cms-content-controller
+      summary: >-
+        Revert CMS Content changes made at staged catalog version, by replacing
+        them with the online catalog version data.
+      operationId: CMS_revertCmsContent
+      parameters:
+        - name: contentId
+          in: path
+          description: CMS content identifier
+          required: true
+          schema:
+            type: string
+        - name: contentType
+          in: path
+          description: CMS Content Type
+          required: true
+          schema:
+            type: string
+            enum:
+              - CMSParagraph
+              - CMSTitle
+              - CMSFileDownload
+              - CMSImage
+              - CMSCarousel
+              - CMSImageZoom
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CMSContent'
+        '201':
+          description: Created
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+  /config:
+    get:
+      summary: Get Environment details
+      operationId: CMS_getConfig
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigData'
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+      deprecated: false
+      tags:
+        - cms-config-controller
+components:
+  schemas:
+    CMSCarousel:
+      title: CMSCarousel
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSCarousel
+          type: object
+          properties:
+            active:
+              type: boolean
+            code:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductRef'
+            scroll:
+              type: string
+            self:
+              type: string
+            showPassageNumber:
+              type: boolean
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            title:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSComponentRef:
+      title: CMSComponentRef
+      type: object
+      properties:
+        code:
+          type: string
+        format:
+          type: string
+        self:
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+    CMSContainer:
+      title: CMSContainer
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        active:
+          type: boolean
+        buyingFrames:
+          type: array
+          items:
+            type: string
+        code:
+          type: string
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/CMSComponentRef'
+        format:
+          type: string
+        hasOnlineVersion:
+          type: boolean
+        label:
+          type: string
+        lastModificationTime:
+          type: integer
+          format: int64
+        name:
+          type: string
+        order:
+          type: integer
+          format: int32
+        productLines:
+          type: array
+          items:
+            type: string
+        self:
+          type: string
+        slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/CMSSlot'
+        styleCSS:
+          type: string
+        styleNameCSS:
+          type: string
+        synchronized:
+          type: boolean
+        type:
+          type: string
+        version:
+          type: string
+    CMSContainerResultData:
+      title: CMSContainerResultData
+      type: object
+      properties:
+        buyingFrameCode:
+          type: array
+          items:
+            type: string
+        buyingFrameName:
+          type: array
+          items:
+            type: string
+        catalogId:
+          type: string
+        catalogVersion:
+          type: string
+        code:
+          type: string
+        containerType:
+          type: string
+        creationtime:
+          type: string
+          format: date-time
+        indexationtime:
+          type: string
+          format: date-time
+        itemSeasonCode:
+          type: array
+          items:
+            type: string
+        itemSeasonName:
+          type: array
+          items:
+            type: string
+        modificationtime:
+          type: string
+          format: date-time
+        name:
+          type: string
+        pk:
+          type: string
+        productCode:
+          type: string
+        self:
+          type: string
+        subDepartmentGroupName:
+          type: array
+          items:
+            type: string
+        themeName:
+          type: string
+    CMSContainersResult:
+      title: CMSContainersResult
+      type: object
+      properties:
+        containers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CMSContainerResultData'
+        totalResult:
+          type: integer
+          format: int64
+    CMSContent:
+      title: CMSContent
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        active:
+          type: boolean
+        code:
+          type: string
+        format:
+          type: string
+        hasOnlineVersion:
+          type: boolean
+        label:
+          type: string
+        lastModificationTime:
+          type: integer
+          format: int64
+        name:
+          type: string
+        order:
+          type: integer
+          format: int32
+        self:
+          type: string
+        styleCSS:
+          type: string
+        styleNameCSS:
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+    CMSFileDownload:
+      title: CMSFileDownload
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSFileDownload
+          type: object
+          properties:
+            active:
+              type: boolean
+            code:
+              type: string
+            description:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            media:
+              $ref: '#/components/schemas/Media'
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSFooterContainer:
+      title: CMSFooterContainer
+      allOf:
+        - $ref: '#/components/schemas/CMSContainer'
+        - title: CMSFooterContainer
+          type: object
+          properties:
+            active:
+              type: boolean
+            buyingFrames:
+              type: array
+              items:
+                type: string
+            code:
+              type: string
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSComponentRef'
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            productLines:
+              type: array
+              items:
+                type: string
+            self:
+              type: string
+            slots:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSSlot'
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            synchronized:
+              type: boolean
+            type:
+              type: string
+            version:
+              type: string
+    CMSImage:
+      title: CMSImage
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSImage
+          type: object
+          properties:
+            active:
+              type: boolean
+            borderStyle:
+              type: string
+            code:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            media:
+              $ref: '#/components/schemas/Media'
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            targetUrl:
+              type: string
+            text:
+              type: string
+            textColor:
+              type: string
+            textPosition:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSImageZoom:
+      title: CMSImageZoom
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSImageZoom
+          type: object
+          properties:
+            active:
+              type: boolean
+            code:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            media:
+              $ref: '#/components/schemas/Media'
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            thumbnail:
+              $ref: '#/components/schemas/Media'
+            type:
+              type: string
+            version:
+              type: string
+    CMSIntegrationPageContainer:
+      title: CMSIntegrationPageContainer
+      allOf:
+        - $ref: '#/components/schemas/CMSContainer'
+        - title: CMSIntegrationPageContainer
+          type: object
+          properties:
+            active:
+              type: boolean
+            buyingFrames:
+              type: array
+              items:
+                type: string
+            code:
+              type: string
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSComponentRef'
+            defaultPage:
+              type: boolean
+            displayedOnMenu:
+              type: boolean
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            productLines:
+              type: array
+              items:
+                type: string
+            self:
+              type: string
+            slots:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSSlot'
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            synchronized:
+              type: boolean
+            title:
+              type: string
+            type:
+              type: string
+            url:
+              type: string
+            version:
+              type: string
+    CMSPageContainer:
+      title: CMSPageContainer
+      allOf:
+        - $ref: '#/components/schemas/CMSContainer'
+        - title: CMSPageContainer
+          type: object
+          properties:
+            active:
+              type: boolean
+            buyingFrames:
+              type: array
+              items:
+                type: string
+            code:
+              type: string
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSComponentRef'
+            defaultPage:
+              type: boolean
+            displayFooter:
+              type: boolean
+            displayedOnMenu:
+              type: boolean
+            footer:
+              $ref: '#/components/schemas/CMSComponentRef'
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            hasSection:
+              type: boolean
+            homepage:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            productLines:
+              type: array
+              items:
+                type: string
+            self:
+              type: string
+            slots:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSSlot'
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            synchronized:
+              type: boolean
+            title:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSParagraph:
+      title: CMSParagraph
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSParagraph
+          type: object
+          properties:
+            active:
+              type: boolean
+            backgroundColor:
+              type: string
+            borderStyle:
+              type: boolean
+            code:
+              type: string
+            content:
+              type: string
+            foregroundColor:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSPdpContainer:
+      title: CMSPdpContainer
+      allOf:
+        - $ref: '#/components/schemas/CMSContainer'
+        - title: CMSPdpContainer
+          type: object
+          properties:
+            active:
+              type: boolean
+            buyingFrames:
+              type: array
+              items:
+                type: string
+            code:
+              type: string
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSComponentRef'
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            itemSeason:
+              type: string
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            priority:
+              type: integer
+              format: int32
+            productCode:
+              type: string
+            productLines:
+              type: array
+              items:
+                type: string
+            productType:
+              type: string
+              enum:
+                - STYLE
+                - LOOK
+                - THEME
+            self:
+              type: string
+            showVideo:
+              type: boolean
+            slots:
+              type: array
+              items:
+                $ref: '#/components/schemas/CMSSlot'
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            synchronized:
+              type: boolean
+            theme:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSSlot:
+      title: CMSSlot
+      type: object
+      properties:
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/CMSComponentRef'
+        themeVisual:
+          $ref: '#/components/schemas/Media'
+        type:
+          type: string
+    CMSTitle:
+      title: CMSTitle
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSTitle
+          type: object
+          properties:
+            active:
+              type: boolean
+            code:
+              type: string
+            displayedOnMenu:
+              type: boolean
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            subTitle:
+              type: string
+            textOnMenu:
+              type: string
+            title:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+    CMSVideo:
+      title: CMSVideo
+      allOf:
+        - $ref: '#/components/schemas/CMSContent'
+        - title: CMSVideo
+          type: object
+          properties:
+            active:
+              type: boolean
+            autoplay:
+              type: boolean
+            backgroundColor:
+              type: string
+            code:
+              type: string
+            contentID:
+              type: string
+            controls:
+              type: string
+            format:
+              type: string
+            hasOnlineVersion:
+              type: boolean
+            height:
+              type: string
+            label:
+              type: string
+            lastModificationTime:
+              type: integer
+              format: int64
+            name:
+              type: string
+            order:
+              type: integer
+              format: int32
+            pcode:
+              type: string
+            playerID:
+              type: string
+            playlist:
+              type: boolean
+            position:
+              type: string
+            self:
+              type: string
+            styleCSS:
+              type: string
+            styleNameCSS:
+              type: string
+            type:
+              type: string
+            version:
+              type: string
+            videoSize:
+              type: string
+            width:
+              type: string
+    FacetResultData:
+      title: FacetResultData
+      type: object
+      properties:
+        facetValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetValue'
+        label:
+          type: string
+        miniSearchCapable:
+          type: boolean
+    FacetValue:
+      title: FacetValue
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        label:
+          type: string
+        value:
+          type: object
+          properties: {}
+    Media:
+      title: Media
+      type: object
+      properties:
+        altText:
+          type: string
+        assetMID:
+          type: string
+        code:
+          type: string
+        lastModificationTime:
+          type: integer
+          format: int64
+        mime:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+        viewAngle:
+          type: string
+    ConfigData:
+      title: ConfigData
+      type: object
+      properties:
+        applicationEnvironment:
+          type: string
+        applicationVersion:
+          type: string
+        brightcoveAccountId:
+          type: string
+        brightcovePlayerResume:
+          type: boolean
+        displayOtbQuantity:
+          type: boolean
+        enableLookCP:
+          type: boolean
+        nbClientBlockMax:
+          type: integer
+          format: int32
+        nbClientBlockPages:
+          type: array
+          items:
+            type: string
+        orwLegacy:
+          type: boolean
+        pepsGoogleAnalyticsEnv:
+          type: string
+        pepsGoogleTagManagerId:
+          type: string
+        showVersion:
+          type: boolean
+        workerInterval:
+          type: integer
+          format: int32
+    ProductRef:
+      title: ProductRef
+      type: object
+      properties:
+        bigImages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        code:
+          type: string
+        imagesMainBig:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        itemSeason:
+          type: string
+        mainBigImage:
+          type: string
+        name:
+          type: string
+        passageNumber:
+          type: integer
+          format: int32
+        productLineCode:
+          type: string
+        self:
+          type: string
+        smallImages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        styleCode:
+          type: string
+        swatchImage:
+          $ref: '#/components/schemas/Media'
+        type:
+          type: string
+        version:
+          type: string
+
+  securitySchemes:
+    Authorization:
+      type: apiKey
+      name: JWT
+      in: header
